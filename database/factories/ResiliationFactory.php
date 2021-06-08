@@ -22,7 +22,14 @@ class ResiliationFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->text(30),
+            'insurance_company_name' => $this->faker->company,
+            'previous_contract' => $this->faker->numberBetween(10000, 90000),
+            'subscription_date' => $this->faker->date(),
+            //'user_id'           => $this->faker->numberBetween(1,5),
+            'moving_out'        => $this->faker->numberBetween(0,1),
+            //'contract_id'       => $this->faker->numberBetween(1, 50),
+            'insured_firstname' => $this->faker->firstName(),
+            'insured_surname'   => $this->faker->lastName(),
         ];
     }
 }

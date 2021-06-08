@@ -7,9 +7,11 @@
         "watch-poll": "mix watch -- --watch-options-poll=1000",
         "hot": "mix watch --hot",
         "prod": "npm run production",
-        "production": "mix --production"
+        "production": "mix --production",
+        "apidoc": "./node_modules/apidoc/bin/apidoc -i app/ -o public/apidocs/"
     },
     "devDependencies": {
+        "apidoc": "^0.27.1",
         "axios": "^0.21",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",

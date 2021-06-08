@@ -22,8 +22,21 @@ class ContractFactory extends Factory
     public function definition()
     {
         return [
-            'number' => $this->faker->numberBetween(1000, 9999),
-            'stored_id' => $this->faker->uuid,
+            'exact_address' => $this->faker->address,
+            'additional_address' => $this->faker->address,
+            'city' => $this->faker->city,
+            'postal_code' => $this->faker->numberBetween(1, 99999),
+            'transfer_date' => $this->faker->randomElement(['5' ,'10', '15']),
+            'contract_start_date' => $this->faker->date(),
+            'contract_expiration_date' => $this->faker->date(),
+            'dependance_postal_code' => $this->faker->numberBetween(1, 99999),
+            'dependance_adresse' => $this->faker->address,
+            'dependance_comp_adresse' => $this->faker->address,
+            'dependance_city' => $this->faker->city,
+            //'user_id' => $this->faker->numberBetween(1, 50),
+            'price_per_month' => $this->faker->numberBetween(1, 50),
+            //'quotation_id' => $this->faker->numberBetween(1, 50),
+            //'resiliation_id' => $this->faker->numberBetween(1, 50),
         ];
     }
 }

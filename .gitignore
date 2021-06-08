@@ -1,11 +1,13 @@
 /node_modules
 /public/hot
+/public/apidocs
 /public/storage
 /storage/*.key
 /vendor
 /.idea
 .env
 .env.backup
+rest.http
 .phpunit.result.cache
 docker-compose.override.yml
 Homestead.json

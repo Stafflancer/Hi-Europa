@@ -15,7 +15,14 @@ class CreateResiliationsTable extends Migration
     {
         Schema::create('resiliations', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->boolean('moving_out')->default(false);
+            $table->string('insurance_company_name')->nullable();
+            $table->string('previous_contract')->nullable();
+            $table->dateTime('subscription_date');
+
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+
             $table->timestamps();
         });
     }

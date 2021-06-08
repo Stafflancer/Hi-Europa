@@ -12,41 +12,34 @@ use Illuminate\Support\Facades\Validator;
 class UserController extends Controller
 {
     /**
-     * @param Request $request
+     * @api {get} /api/admin/user Get Users
+     * @apiVersion 0.1.0
+     * @apiName GetUsers
+     * @apiGroup Wakam
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @apiHeader {String} authorization="Bearer TOKEN" Authorization "Bearer TOKEN"
+     *
+     * @apiParam {Number}   [page=1]          Current Page.
+     * @apiParam {Number}   [per_page=15]     Items Per Page.
+     * @apiParam {Number}   [count=15]        Same as per_page, deprecated.
+     * @apiExample Example usage:
+     * curl -H "Authorization: Bearer $TOKEN" -H "Accept: application/json" http://localhost:8000/api/admin/user
      */
     public function index(Request $request)
     {
-        $users = User::orderBy('id', 'desc')->with('wakam_service', 'ima_service');
-        if ($request->has('service') && $request->input('service') === 'ima') {
-            $users->whereHas('ima_service', function ($query) {
-                $query->where('id', '>', 0);
-            });
-        }
-
-        if ($request->has('service') && $request->input('service') === 'wakam') {
-            $users->whereHas('wakam_service', function ($query) {
-                $query->where('id', '>', 0);
-            });
-        }
-
-        $page = $request->input('page') ? : 1;
-        $take = $request->input('count') ? : 10;
-        $count = $users->count();
-
-        if ($page) {
-            $skip = $take * ($page - 1);
-            $users = $users->take($take)->skip($skip);
-        } else {
-            $users = $users->take($take)->skip(0);
-        }
+        $data = $this->pipelineQuery(
+            User::with('quotation', 'contract', 'resiliation'),
+            User::PIPES,
+            [],
+            true,
+            $request->input('per_page', $request->input('count', 10))
+        );
 
         return response()->json([
-            'data' =>  UserResource::collection($users->get()),
-            'pagination'=>[
-                'count_pages' => ceil($count / $take),
-                'count' => $count
+            'data' =>  $data->items(),
+            'pagination' => [
+                'count' => $data->total(),
+                'count_pages' => ceil($data->total() / $data->perPage()),
             ]
         ], 200);
     }
@@ -109,7 +102,7 @@ class UserController extends Controller
             'first_name' => 'required',
             'last_name' => 'required',
             'phone_number' => 'required',
-            'email' => 'required|email|unique:users,email,'.$id,
+            'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'sometimes|required|string|min:6',
             'password_confirmation' => 'sometimes|required_with:password|same:password|min:6'
         ]);

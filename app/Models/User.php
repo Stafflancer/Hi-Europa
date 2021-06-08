@@ -2,12 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Filters\City;
+use App\Filters\Email;
+use App\Filters\FirstName;
+use App\Filters\Id;
+use App\Filters\LastName;
+use App\Filters\OrderBy;
+use App\Filters\PhoneNumber;
+use App\Filters\PostalCode;
+use App\Scopes\OrderByScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Tymon\JWTAuth\Contracts\JWTSubject;
 
 class User extends Model
 {
@@ -21,34 +27,60 @@ class User extends Model
     protected $fillable = [
         'first_name',
         'last_name',
+        'title',
         'phone_number',
+        'landline_phone',
         'email',
+        'gender',
+        'address',
+        'postal_code',
+        'opt_in_hieuropa',
+        'birthday',
+        'residency_type',
+        'residence_type',
+        'floor',
+        'number_rooms',
+        'got_insurance',
+        'live_there_time',
+        'insured_time',
+        'is_pb_prime',
+        'contract_id',
     ];
 
-    protected $appends = ['service_name'];
-
+    const PIPES = [
+        Id::class,
+        FirstName::class,
+        LastName::class,
+        Email::class,
+        PhoneNumber::class,
+        PostalCode::class,
+        City::class,
+        OrderBy::class,
+    ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * The "booted" method of the model.
+     *
+     * @return void
      */
-    public function wakam_service()
+    protected static function booted()
     {
-        return $this->hasOne(WakamService::class);
+        static::addGlobalScope(new OrderByScope);
     }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasOne
      */
-    public function ima_service()
+    public function contract()
     {
-        return $this->hasOne(ImaService::class);
+        return $this->hasOne(Contract::class);
     }
 
     /**
-     * @return string
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function getServiceNameAttribute()
+    public function quotation()
     {
-        return $this->wakam_service()->first() ? 'Wakam' : 'Ima';
+        return $this->hasMany(Quotation::class);
     }
 }

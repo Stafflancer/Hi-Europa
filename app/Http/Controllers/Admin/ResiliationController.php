@@ -5,36 +5,51 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\ResiliationResource;
 use App\Models\Resiliation;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class ResiliationController extends Controller
 {
     /**
-     * @param Request $request
+     * @api {get} /api/admin/resiliation Get Resiliations
+     * @apiVersion 0.1.0
+     * @apiName GetResiliations
+     * @apiGroup Wakam
      *
-     * @return \Illuminate\Http\JsonResponse
+     * @apiHeader {String} Authorization="Bearer TOKEN" Authorization "Bearer TOKEN"
+     * @apiHeader {String} Accept="application/json"    Accept Json
+     * @apiHeader {String} Content-Type="application/json"    Content-Type Json"
+     *
+     * @apiParam {Number}   [id]    Filter by id
+     * @apiParam {Number}   [user_id]    Filter by user_id
+     * @apiParam {String="id"}   order_by          Results Order By
+     * @apiParam {String="desc", "asc"}   order             Results Order.
+     * @apiParam {Number}   [page=1]          Current Page.
+     * @apiParam {Number}   [per_page=15]     Items Per Page.
+     * @apiParam {Number}   [count=15]        Same as per_page, deprecated
+     * @apiExample Example usage:
+     * curl -H "Authorization: Bearer $TOKEN" -H "Accept: application/json" "http://localhost:8000/api/admin/resiliation"
      */
     public function index(Request $request)
     {
-        $resiliations = Resiliation::orderBy('id', 'desc')->with('wakam_service');
-        $page = $request->input('page') ? : 1;
-        $take = $request->input('count') ? : 10;
-        $count = $resiliations->count();
-
-        if ($page) {
-            $skip = $take * ($page - 1);
-            $resiliations = $resiliations->take($take)->skip($skip);
-        } else {
-            $resiliations = $resiliations->take($take)->skip(0);
-        }
+        $data = $this->pipelineQuery(
+            Resiliation::query()->with('user.contract'),
+            Resiliation::PIPES,
+            [],
+            true,
+            $request->input('per_page', $request->input('count', 10))
+        );
+        $perPage = $data->perPage();
+        $total = $data->total();
 
         return response()->json([
-            'data' =>  ResiliationResource::collection($resiliations->get()),
-            'pagination'=>[
-                'count_pages' => ceil($count / $take),
-                'count' => $count
+            'data' =>  $data->items(),
+            'pagination' => [
+                'count_pages' => ceil($total / $perPage),
+                'current_page' => $data->currentPage(),
+                'count' => $total
             ]
-        ], 200);
+        ], JsonResponse::HTTP_OK);
     }
 
     /**
@@ -59,14 +74,15 @@ class ResiliationController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * @param $id
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return ResiliationResource
      */
     public function show($id)
     {
-        //
+        $resiliation = Resiliation::find($id);
+
+        return new  ResiliationResource($resiliation->load('user.contract'));
     }
 
     /**

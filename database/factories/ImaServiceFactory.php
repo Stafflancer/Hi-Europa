@@ -39,9 +39,6 @@ class ImaServiceFactory extends Factory
             'contract_id' => function () {
                 return Contract::factory()->create()->id;
             },
-            'quotation_id' => function () {
-                return Quotation::factory()->create()->id;
-            },
         ];
     }
 }

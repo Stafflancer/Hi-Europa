@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -15,4 +16,20 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
+});
+
+Route::get('/mail-test', function () {
+    try {
+        $token = $_GET['token'] ?? '';
+        if ($token !== 'itc') {
+            throw new Exception('You shall not pass.');
+        }
+        Mail::raw("I keep forgetting how to send an email in Laravel without using Mailables. The the documentation does not help so I’m writing this down here for future reference.", function ($message) {
+            $message->to('yingying.yao@it-consultis.com')
+                ->subject('My Introduction');
+        });
+        return "Done Test";
+    } catch (\Throwable $th) {
+        return $th->getMessage();
+    }
 });

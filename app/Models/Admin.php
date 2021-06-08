@@ -46,4 +46,12 @@ class Admin extends Authenticatable implements JWTSubject
     public function getJWTCustomClaims() {
         return [];
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function admin_role()
+    {
+        return $this->belongsTo(AdminRole::class);
+    }
 }

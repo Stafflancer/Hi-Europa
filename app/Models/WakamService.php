@@ -11,6 +11,12 @@ class WakamService extends Model
 
     protected $with = ['user'];
 
+    protected $fillable = [
+        'user_id',
+        'quotation_id',
+        'contract_id',
+    ];
+
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -18,14 +24,6 @@ class WakamService extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function quotation()
-    {
-        return $this->belongsTo(Quotation::class);
     }
 
     /**

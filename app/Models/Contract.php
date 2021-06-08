@@ -2,6 +2,13 @@
 
 namespace App\Models;
 
+use App\Filters\City;
+use App\Filters\Id;
+use App\Filters\OrderBy;
+use App\Filters\PostalCode;
+use App\Filters\PostCode;
+use App\Filters\UserId;
+use App\Scopes\OrderByScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,37 +19,87 @@ class Contract extends Model
     /**
      * @var array
      */
-    protected $appends = ['service_name', 'service'];
+    protected $appends = [
+        'pdf_link'
+    ];
+
+    protected $fillable = [
+        'exact_address',
+        'additional_address',
+        'city',
+        'postal_code',
+        'contract_start_date',
+        'contract_expiration_date',
+        'dependance_postal_code',
+        'dependance_adresse',
+        'dependance_comp_adresse',
+        'dependance_city',
+        'user_id',
+        'quotation_id',
+        'price_per_month',
+        'resiliation_id',
+        'transfer_date'
+    ];
+
+    const PIPES = [
+        Id::class,
+        UserId::class,
+        PostalCode::class,
+        PostCode::class,
+        City::class,
+        OrderBy::class,
+    ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * The "booted" method of the model.
+     *
+     * @return void
      */
-    public function wakam_service()
+    protected static function booted()
     {
-        return $this->hasOne(WakamService::class);
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function ima_service()
-    {
-        return $this->hasOne(ImaService::class);
+        static::addGlobalScope(new OrderByScope);
     }
 
     /**
      * @return string
      */
-    public function getServiceNameAttribute()
+    public function getPdfLinkAttribute()
     {
-        return $this->wakam_service()->first() ? 'Wakam' : 'Ima';
+        if ($this->pdf) {
+            return asset('storage/contract-pdfs/' . $this->pdf);
+        }
+        return null;
     }
 
     /**
-     * @return string
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function getServiceAttribute()
+    public function user()
     {
-        return $this->wakam_service()->first() ? $this->wakam_service()->first() : $this->ima_service()->first();
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\hasOne
+     */
+    public function quotation()
+    {
+        return $this->hasOne(Quotation::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\hasOne
+     */
+    public function resiliation()
+    {
+        return $this->hasOne(Resiliation::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function residents()
+    {
+        return $this->hasMany(Resident::class);
     }
 }

@@ -41,16 +41,6 @@ class ImaService extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function quotation()
-    {
-        return $this->belongsTo(Quotation::class);
-    }
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
     public function contract()
     {
         return $this->belongsTo(Contract::class);

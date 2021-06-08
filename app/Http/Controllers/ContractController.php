@@ -2,7 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Contract;
+use App\Models\User;
+use App\Models\WakamService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator;
+use PDF;
 
 class ContractController extends Controller
 {
@@ -17,24 +23,41 @@ class ContractController extends Controller
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
      * Store a newly created resource in storage.
+     * @param Request $request
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'exact_address' => 'required',
+            'city' => 'required',
+            'postal_code' => 'required',
+            'user_id' => 'required',
+            'quotation_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 422);
+        }
+
+        $data = $request->all();
+
+        $contract = Contract::create($data);
+
+        // @todo What's this about??
+        // $contract->load('user');
+        // $user =  $contract->user;
+        // $pdf = PDF::loadView('pdf.contract', compact('contract', 'user'));
+        // $pdfFileName = 'contract-' .$contract->id. '.pdf';
+        // Storage::put('public/contract-pdfs/' . $pdfFileName, $pdf->output());
+        // $contract->pdf = $pdfFileName;
+        // $contract->save();
+
+        return response()->json([
+            'data' => $contract
+        ],200);
     }
 
     /**

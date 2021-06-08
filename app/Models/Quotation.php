@@ -2,6 +2,11 @@
 
 namespace App\Models;
 
+use App\Filters\Id;
+use App\Filters\OrderBy;
+use App\Filters\PostalCode;
+use App\Filters\UserId;
+use App\Scopes\OrderByScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -9,35 +14,65 @@ class Quotation extends Model
 {
     use HasFactory;
 
-    protected $appends = ['service_name', 'service'];
+    /**
+     * @var array
+     */
+    protected $fillable = [
+        'postal_code',
+        'type_accommodation',
+        'prospect_type',
+        'type_residence',
+        'apartment_floor',
+        'apartment_surface',
+        'room',
+        'user_id',
+        'contract_id',
+        'insured',
+        'termination',
+        'franchise',
+        'furniture_capital',
+        'furniture_two_years_old',
+        'total_value_furniture_400',
+        'total_value_furniture_1800',
+        'estimated_coverage',
+        'option_glass',
+        'option_thief',
+        'option_mobile',
+        'school_insurance',
+        'cost_month',
+        'dependencies'
+    ];
+
+    const PIPES = [
+        Id::class,
+        UserId::class,
+        PostalCode::class,
+        OrderBy::class,
+    ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * The "booted" method of the model.
+     *
+     * @return void
      */
-    public function wakam_service()
+    protected static function booted()
     {
-        return $this->hasOne(WakamService::class);
+        static::addGlobalScope(new OrderByScope);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function ima_service()
+    public function user()
     {
-        return $this->hasOne(ImaService::class);
+        return $this->belongsTo(User::class);
     }
+
     /**
-     * @return string
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function getServiceNameAttribute()
+    public function contract()
     {
-        return $this->wakam_service()->first() ? 'Wakam' : 'Ima';
-    }
-    /**
-     * @return string
-     */
-    public function getServiceAttribute()
-    {
-        return $this->wakam_service()->first() ? $this->wakam_service()->first() : $this->ima_service()->first();
+        return $this->belongsTo(Contract::class);
     }
 }

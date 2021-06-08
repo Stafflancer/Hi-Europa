@@ -17,8 +17,18 @@ class CreateUsersTable extends Migration
             $table->id();
             $table->string('first_name');
             $table->string('last_name');
+            $table->string('title')->nullable();
             $table->string('email');
-            $table->string('phone_number');
+            $table->string('phone_number')->nullable();
+            $table->string('landline_phone')->nullable();
+            $table->string('gender')->nullable()->comment('male, female');
+            $table->string('address')->nullable();
+            $table->string('city')->nullable();
+            $table->string('birthday')->nullable();
+            $table->string('postal_code')->nullable();
+            $table->boolean('insurance_payed')->default(0);
+            $table->boolean('receive_info')->default(0);
+
             $table->timestamps();
         });
     }

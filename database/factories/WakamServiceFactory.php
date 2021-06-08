@@ -30,9 +30,6 @@ class WakamServiceFactory extends Factory
             'user_id' => function () {
                 return User::factory()->create()->id;
             },
-            'quotation_id'  => function () {
-                return Quotation::factory()->create()->id;
-            },
             'wakam_insurance_id' => function () {
                 return WakamInsurance::factory()->create()->id;
             },
